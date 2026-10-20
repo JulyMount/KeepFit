@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fitness App</title>
 
+  <!-- Chart.js para renderização de gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <!-- Biblioteca Google-->
    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -46,7 +49,24 @@
     <!-- Aba 3: Evolução Corporal -->
     <section id="view-evolucao" class="view">
       <div id="evolucao-container">
-        <!-- Conteúdo carregado via evolucaoView.js -->
+        
+        <div class="header-section">
+          <h2>Evolução Corporal & Nutricional</h2>
+          <p>Acompanhe a correlação entre consumo calórico e peso ao longo do tempo.</p>
+        </div>
+
+        <!-- Filtro de Período -->
+        <div class="periodo-selector" style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 15px;">
+          <button class="btn-filtro active" data-dias="7">7 dias</button>
+          <button class="btn-filtro" data-dias="30">30 dias</button>
+          <button class="btn-filtro" data-dias="90">90 dias</button>
+        </div>
+
+        <!-- Container do Gráfico -->
+        <div class="chart-card" style="position: relative; height: 350px; width: 100%; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          <canvas id="graficoEvolucao"></canvas>
+        </div>
+
       </div>
     </section>
 
