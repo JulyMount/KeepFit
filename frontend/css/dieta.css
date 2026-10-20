@@ -1,0 +1,140 @@
+/* Card de Resumo de Calorias e Macros */
+.summary-card {
+  background-color: var(--surface-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.calorie-progress {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.calorie-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.calorie-target {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.macros-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.macro-item {
+  background-color: var(--bg-color);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.macro-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.macro-value {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+/* Formulário de Registro (IA e Manual) */
+.input-card {
+  background-color: var(--surface-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+textarea, input[type="text"], input[type="number"] {
+  width: 100%;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+textarea:focus, input:focus {
+  border-color: var(--primary-color);
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #000000;
+}
+
+.btn-secondary {
+  background-color: var(--surface-hover);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn:active {
+  opacity: 0.8;
+}
+
+/* Lista de Refeições Registradas */
+.meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meal-item {
+  background-color: var(--surface-color);
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-color);
+}
+
+.meal-info h4 {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.meal-info p {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.meal-calories {
+  font-weight: bold;
+  color: var(--primary-color);
+}

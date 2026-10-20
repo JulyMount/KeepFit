@@ -1,0 +1,106 @@
+/* Seletor de Dias da Semana */
+.day-selector {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  scrollbar-width: none;
+}
+
+.day-selector::-webkit-scrollbar {
+  display: none;
+}
+
+.day-chip {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.day-chip.active {
+  background-color: var(--primary-color);
+  color: #000000;
+  border-color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* Cartão de Exercício */
+.exercise-card {
+  background-color: var(--surface-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.exercise-title {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.exercise-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Tabela de Séries e Cargas */
+.sets-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-color);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.set-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  width: 50px;
+}
+
+.set-input-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.set-input-group input {
+  width: 60px;
+  padding: 6px;
+  text-align: center;
+}
+
+.checkbox-done {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.btn-finish-workout {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  font-size: 1rem;
+}

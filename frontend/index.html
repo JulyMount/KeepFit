@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness App</title>
+
+  <!-- Biblioteca Google-->
+   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
+
+  <!-- Estilos CSS Separados -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/dieta.css">
+  <link rel="stylesheet" href="css/treino.css">
+  <link rel="stylesheet" href="css/evolucao.css">
+</head>
+<body>
+
+  <!-- Container de Cabeçalho -->
+  <header class="app-header">
+    <h1 id="header-title">Dieta</h1>
+    <span id="user-status-badge" class="badge offline">Offline</span>
+  </header>
+
+  <!-- Área Principal de Conteúdo (Views) -->
+  <main class="app-content">
+
+    <!-- Aba 1: Dieta -->
+    <section id="view-dieta" class="view active">
+      <div id="dieta-container">
+        <!-- Conteúdo carregado via dietaView.js -->
+      </div>
+    </section>
+
+    <!-- Aba 2: Treino -->
+    <section id="view-treino" class="view">
+      <div id="treino-container">
+        <!-- Conteúdo carregado via treinoView.js -->
+      </div>
+    </section>
+
+    <!-- Aba 3: Evolução Corporal -->
+    <section id="view-evolucao" class="view">
+      <div id="evolucao-container">
+        <!-- Conteúdo carregado via evolucaoView.js -->
+      </div>
+    </section>
+
+    <!-- Aba 4: Configurações -->
+    <section id="view-config" class="view">
+      <div id="config-container">
+        <!-- Conteúdo carregado via configView.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Barra de Navegação Inferior -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-target="view-dieta" data-title="Dieta">
+      <span class="icon">🍎</span>
+      <span class="label">Dieta</span>
+    </button>
+
+    <button class="nav-btn" data-target="view-treino" data-title="Treino">
+      <span class="icon">🏋️</span>
+      <span class="label">Treino</span>
+    </button>
+
+    <button class="nav-btn" data-target="view-evolucao" data-title="Evolução">
+      <span class="icon">📈</span>
+      <span class="label">Evolução</span>
+    </button>
+
+    <button class="nav-btn" data-target="view-config" data-title="Ajustes">
+      <span class="icon">⚙️</span>
+      <span class="label">Ajustes</span>
+    </button>
+  </nav>
+
+  <!-- Modal de Confirmação -->
+  <div id="modalConfirmacao" class="modal-overlay hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;">
+    <div style="background: #1e1e1e; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; color: white;">
+      <h3 style="margin-top:0;">Confirmar Refeição</h3>
+      
+      <label style="display:block; margin-bottom: 8px;">
+        Descrição:
+        <input type="text" id="editDescricao" style="width: 100%; padding: 8px; margin-top: 4px; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 6px;">
+      </label>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+        <label>Kcal: <input type="number" id="editKcal" style="width: 100%; padding: 6px; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 6px;"></label>
+        <label>Proteínas (g): <input type="number" id="editProteinas" style="width: 100%; padding: 6px; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 6px;"></label>
+        <label>Carbos (g): <input type="number" id="editCarbos" style="width: 100%; padding: 6px; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 6px;"></label>
+        <label>Gorduras (g): <input type="number" id="editGorduras" style="width: 100%; padding: 6px; background: #2b2b2b; border: 1px solid #444; color: white; border-radius: 6px;"></label>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+        <button id="btnCancelarModal" style="padding: 8px 16px; background: #555; border: none; color: white; border-radius: 6px; cursor: pointer;">Cancelar</button>
+        <button id="btnSalvarModal" style="padding: 8px 16px; background: #00c853; border: none; color: white; border-radius: 6px; cursor: pointer;">Confirmar e Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts JavaScript Separados -->
+  <script src="js/utils/storage.js"></script>
+  <script src="js/utils/calculos.js"></script>
+  <script src="js/utils/syncOffline.js"></script>
+
+  <script src="js/services/authService.js"></script>
+  <script src="js/services/geminiService.js"></script>
+  <script src="js/services/sheetsService.js"></script>
+
+  <script src="js/views/dietaView.js"></script>
+  <script src="js/views/treinoView.js"></script>
+  <script src="js/views/evolucaoView.js"></script>
+  <script src="js/views/configView.js"></script>
+
+  <script src="js/navigation.js"></script>
+
+  <script src="sw.js"></script>
+</body>
+</html>
