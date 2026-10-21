@@ -22,6 +22,7 @@ const DietaView = {
     this.render(container);
     this.fecharModal();
     this.bindEvents();
+    this.atualizarTotais(); // Atualiza a meta calórica no cabeçalho imediatamente
     await this.carregarRefeicoesDoDia();
   },
 
@@ -31,7 +32,7 @@ const DietaView = {
       <div class="summary-card">
         <div class="calorie-progress">
           <div class="calorie-number" id="dieta-total-calorias">0</div>
-          <div class="calorie-target">de 1.850 kcal diárias</div>
+          <div class="calorie-target" id="dieta-target-calorias">de 2.000 kcal diárias</div>
         </div>
         <div class="macros-grid">
           <div class="macro-item">
@@ -101,7 +102,6 @@ const DietaView = {
       return;
     }
 
-    // Identifica dinamicamente a função de busca disponível no SheetsService
     const fnObter = SheetsService.obterRefeicoes || 
                     SheetsService.carregarRefeicoes || 
                     SheetsService.buscarRefeicoes || 
@@ -120,7 +120,6 @@ const DietaView = {
       if (Array.isArray(refeicoesNuvem) && refeicoesNuvem.length > 0) {
         const hojeStr = new Date().toLocaleDateString('pt-BR');
 
-        // 1. Mapeia os dados recebidos da nuvem preservando o campo dataHora
         const todasMapeadas = refeicoesNuvem.map(ref => ({
           dataHora: ref.dataHora || ref.DataHora || ref.data || '',
           descricao: ref.descricao || ref.Descrição || ref.prato || ref.alimento || 'Refeição',
@@ -130,7 +129,6 @@ const DietaView = {
           gorduras_g: Math.round(ref.gorduras_g || ref.gorduras || ref.Gorduras || 0)
         }));
 
-        // 2. Filtra apenas as refeições cujo dia corresponde à data de hoje
         this.refeicoesDoDia = todasMapeadas.filter(ref => {
           if (!ref.dataHora) return false;
           const dataApenas = ref.dataHora.split(',')[0].split(' ')[0].trim();
@@ -286,6 +284,16 @@ const DietaView = {
     const elProt = document.getElementById('dieta-total-proteinas');
     const elCarb = document.getElementById('dieta-total-carbos');
     const elGord = document.getElementById('dieta-total-gorduras');
+    const elTargetCal = document.getElementById('dieta-target-calorias');
+
+    // Busca a meta atualizada no LocalStorage
+    if (typeof StorageService !== 'undefined') {
+      const metas = StorageService.getMetas();
+      if (metas && metas.metaKcal) {
+        const metaFormatada = Number(metas.metaKcal).toLocaleString('pt-BR');
+        if (elTargetCal) elTargetCal.textContent = `de ${metaFormatada} kcal diárias`;
+      }
+    }
 
     if (elCal) elCal.textContent = Math.round(totais.calorias);
     if (elProt) elProt.textContent = `${Math.round(totais.proteinas)}g`;

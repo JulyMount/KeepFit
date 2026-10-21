@@ -4,7 +4,6 @@ const treinoPrompt = require('../prompts/treinoPrompt');
 
 // Executa o prompt nos modelos válidos e suportados da API Gemini
 async function gerarComFallback(genAI, prompt) {
-  // Modelos oficiais e suportados da SDK do Gemini
   const modelos = [
     'gemini-3-flash-preview'
   ];
@@ -76,6 +75,49 @@ const geminiController = {
       return res.json(jsonTreino);
     } catch (error) {
       console.error('[GeminiController Error - Treino]:', error);
+      return res.status(500).json({ error: `Erro na API Gemini: ${error.message || 'Falha interna'}` });
+    }
+  },
+
+  // Calcula as metas nutricionais na Anamnese do Onboarding
+  async calcularAnamnese(req, res) {
+    try {
+      const apiKey = req.headers['x-gemini-key'] || req.body.apiKey;
+      const { idade, sexo, peso, altura, nivelAtividade, objetivo } = req.body;
+
+      if (!apiKey) {
+        return res.status(400).json({ error: 'Chave da API Gemini é obrigatória.' });
+      }
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const prompt = `
+Atue como um nutricionista desportivo especialista. Com base nos dados fornecidos do utilizador, calcule as suas metas diárias exatas de calorias e macronutrientes.
+
+Dados do Utilizador:
+- Idade: ${idade} anos
+- Sexo Biológico: ${sexo}
+- Peso: ${peso} kg
+- Altura: ${altura} cm
+- Nível de Atividade Física: ${nivelAtividade}
+- Objetivo Principal: ${objetivo}
+
+Responda EXCLUSIVAMENTE num objeto JSON válido no seguinte formato e nada mais:
+{
+  "metaKcal": 2200,
+  "metaProteinasG": 160,
+  "metaCarboidratosG": 220,
+  "metaGordurasG": 60,
+  "resumoEstrategia": "Breve frase explicativa da estratégia calculada (máximo 20 palavras)."
+}
+`;
+
+      const result = await gerarComFallback(genAI, prompt);
+      const responseText = result.response.text();
+
+      const jsonAnamnese = extrairJSON(responseText);
+      return res.json(jsonAnamnese);
+    } catch (error) {
+      console.error('[GeminiController Error - Anamnese]:', error);
       return res.status(500).json({ error: `Erro na API Gemini: ${error.message || 'Falha interna'}` });
     }
   }
