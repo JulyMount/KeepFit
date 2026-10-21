@@ -1,5 +1,6 @@
 /**
  * Controlador de interface para a aba de Evolução Física e Nutricional.
+ * Com suporte a resiliência de token e armazenamento offline.
  */
 
 const EvolucaoView = {
@@ -102,7 +103,7 @@ const EvolucaoView = {
       });
     });
 
-    // 2. Evento do Botão Salvar Medição
+    // 2. Evento do Botão Salvar Medição (Com Suporte Offline - T08)
     const btnSalvar = document.getElementById('btn-salvar-medida');
     if (!btnSalvar) return;
 
@@ -125,11 +126,12 @@ const EvolucaoView = {
         ? calcularComposicaoCorporal(peso, bf)
         : { massaMagraKg: 0, massaGordaKg: 0 };
 
-      // Atualiza os cards de métrica
+      // Atualiza os cards de métrica imediatamente
       document.getElementById('eval-bf').textContent = `${bf}%`;
       document.getElementById('eval-massa-magra').textContent = `${composicao.massaMagraKg} kg`;
 
       const payload = {
+        dataHora: new Date().toLocaleString('pt-BR'),
         pesoKg: peso,
         cinturaCm: cintura,
         pescocoCm: pescoco,
@@ -138,20 +140,50 @@ const EvolucaoView = {
         massaGordaKg: composicao.massaGordaKg
       };
 
+      const estaOnline = navigator.onLine;
+      const temToken = typeof StorageService !== 'undefined' && StorageService.hasGoogleToken();
+
+      // Trata modo offline ou falta de token Google
+      if (!estaOnline || !temToken) {
+        if (typeof StorageService !== 'undefined') {
+          StorageService.addToOfflineQueue({ tipo: 'medidas', dados: payload });
+          alert('Medição salva localmente (offline)! Será sincronizada assim que reconectar.');
+        }
+        return;
+      }
+
       try {
         await SheetsService.registrarMedida(payload);
         alert('Medição registrada no Google Sheets!');
-        // Atualiza o gráfico imediatamente com a nova medição
         await this.carregarEExibirGrafico();
       } catch (err) {
-        alert(`Erro ao registrar medição: ${err.message}`);
+        console.warn('⚠️ Erro ao registrar medição na nuvem. Guardando na fila offline:', err.message);
+        if (typeof StorageService !== 'undefined') {
+          StorageService.addToOfflineQueue({ tipo: 'medidas', dados: payload });
+          alert('Medição salva na fila offline para sincronização posterior.');
+        }
       }
     });
   },
 
   async carregarEExibirGrafico() {
+    // 1. Prevenção de Erros 401 (T01 / T02): Se não houver token do Google, suspende busca remota
+    if (typeof StorageService !== 'undefined' && !StorageService.hasGoogleToken()) {
+      console.warn('ℹ️ Carregamento do gráfico suspenso: Conta Google não conectada.');
+      const dadosVazios = this.processarDados([], [], this.diasFiltro);
+      this.renderizarGrafico(dadosVazios);
+      return;
+    }
+
+    // 2. Modo Offline (T08): Se estiver sem internet, exibe a estrutura do gráfico sem requisições
+    if (!navigator.onLine) {
+      console.warn('📡 Dispositivo Offline. Exibindo gráfico sem novos dados da nuvem.');
+      const dadosOff = this.processarDados([], [], this.diasFiltro);
+      this.renderizarGrafico(dadosOff);
+      return;
+    }
+
     try {
-      // Identifica funções disponíveis no SheetsService
       const fnDieta = SheetsService.obterRefeicoes || SheetsService.carregarRefeicoes || SheetsService.buscarRefeicoes || SheetsService.getRefeicoes;
       const fnAntropo = SheetsService.obterAntropometria || SheetsService.buscarMedidas || SheetsService.obterMedidas || SheetsService.carregarMedidas;
 
@@ -169,18 +201,15 @@ const EvolucaoView = {
     const mapaDatas = {};
     const hoje = new Date();
 
-    // Cria o mapa retroativo de datas
     for (let i = dias - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(hoje.getDate() - i);
-      // Formata como DD/MM (ex: 15/10) em vez de DD/MM/YYYY
       const dataChaveFull = d.toLocaleDateString('pt-BR');
       const dataLabelCurta = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
       
       mapaDatas[dataChaveFull] = { label: dataLabelCurta, kcal: 0, peso: null };
     }
 
-    // Soma calorias por data
     if (Array.isArray(dieta)) {
       dieta.forEach(item => {
         const dataRaw = item.dataHora || item.DataHora || item.data || '';
@@ -192,7 +221,6 @@ const EvolucaoView = {
       });
     }
 
-    // Associa medição de peso
     if (Array.isArray(antropometria)) {
       antropometria.forEach(item => {
         const dataRaw = item.dataHora || item.DataHora || item.data || item.Data || '';
@@ -217,7 +245,6 @@ const EvolucaoView = {
     const canvas = document.getElementById('graficoEvolucao');
     if (!canvas || typeof Chart === 'undefined') return;
 
-    // Ajusta o card pai para integrar com o tema escuro
     const cardPai = canvas.closest('.card-evolucao');
     if (cardPai) {
       cardPai.style.background = '#1e1e1e';
@@ -278,7 +305,7 @@ const EvolucaoView = {
           yPeso: {
             type: 'linear',
             position: 'right',
-            beginAtZero: false, // Não força zero para destacar variações pequenas de peso
+            beginAtZero: false,
             title: { display: true, text: 'Peso (kg)', color: '#2196F3' },
             ticks: { color: '#2196F3' },
             grid: { display: false }

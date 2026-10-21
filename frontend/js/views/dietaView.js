@@ -1,5 +1,5 @@
 /**
- * Controlador de interface para a aba de Dieta com detecção dinâmica do SheetsService.
+ * Controlador de interface para a aba de Dieta com suporte a Offline-First e tratamento de resiliência.
  */
 
 function somarMacros(refeicoes) {
@@ -22,7 +22,7 @@ const DietaView = {
     this.render(container);
     this.fecharModal();
     this.bindEvents();
-    this.atualizarTotais(); // Atualiza a meta calórica no cabeçalho imediatamente
+    this.atualizarTotais(); // Atualiza as metas locais imediatamente
     await this.carregarRefeicoesDoDia();
   },
 
@@ -94,10 +94,28 @@ const DietaView = {
   },
 
   async carregarRefeicoesDoDia() {
-    console.log('🔄 Iniciando busca de dados...');
+    // 1. Prevenção de Erros 401 (T01 / T02): Se não houver token do Google, interrompe a chamada à nuvem
+    if (typeof StorageService !== 'undefined' && !StorageService.hasGoogleToken()) {
+      console.warn('ℹ️ Busca cancelada: Conta Google não conectada.');
+      this.refeicoesDoDia = this.obterRefeicoesOfflineDoDia();
+      this.atualizarTotais();
+      this.renderLista();
+      return;
+    }
+
+    // 2. Prevenção de Falha Offline (T08): Se estiver sem internet, carrega dados locais/fila
+    if (!navigator.onLine) {
+      console.warn('📡 Dispositivo Offline. Carregando refeições salvas localmente...');
+      this.refeicoesDoDia = this.obterRefeicoesOfflineDoDia();
+      this.atualizarTotais();
+      this.renderLista();
+      return;
+    }
+
+    console.log('🔄 Iniciando busca de dados na nuvem...');
 
     if (typeof SheetsService === 'undefined') {
-      console.error('❌ Erro: SheetsService não está carregado. Verifique a inclusão de sheetsService.js no index.html!');
+      console.error('❌ Erro: SheetsService não está carregado.');
       this.renderLista();
       return;
     }
@@ -108,7 +126,7 @@ const DietaView = {
                     SheetsService.getRefeicoes;
 
     if (typeof fnObter !== 'function') {
-      console.error('❌ Erro: Nenhuma função conhecida de busca foi encontrada dentro do SheetsService. Métodos disponíveis:', Object.keys(SheetsService));
+      console.error('❌ Erro: Nenhuma função conhecida de busca encontrada no SheetsService.');
       this.renderLista();
       return;
     }
@@ -117,33 +135,50 @@ const DietaView = {
       const refeicoesNuvem = await fnObter.call(SheetsService);
       console.log('📊 Resposta recebida do Google Sheets:', refeicoesNuvem);
 
-      if (Array.isArray(refeicoesNuvem) && refeicoesNuvem.length > 0) {
-        const hojeStr = new Date().toLocaleDateString('pt-BR');
+      const hojeStr = new Date().toLocaleDateString('pt-BR');
 
-        const todasMapeadas = refeicoesNuvem.map(ref => ({
+      let refeicoesMapeadas = [];
+      if (Array.isArray(refeicoesNuvem) && refeicoesNuvem.length > 0) {
+        refeicoesMapeadas = refeicoesNuvem.map(ref => ({
           dataHora: ref.dataHora || ref.DataHora || ref.data || '',
           descricao: ref.descricao || ref.Descrição || ref.prato || ref.alimento || 'Refeição',
           calorias_kcal: Math.round(ref.calorias_kcal || ref.calorias || ref.Calorias || ref.kcal || 0),
           proteinas_g: Math.round(ref.proteinas_g || ref.proteinas || ref.Proteinas || 0),
           carboidratos_g: Math.round(ref.carboidratos_g || ref.carboidratos || ref.Carboidratos || 0),
           gorduras_g: Math.round(ref.gorduras_g || ref.gorduras || ref.Gorduras || 0)
-        }));
-
-        this.refeicoesDoDia = todasMapeadas.filter(ref => {
+        })).filter(ref => {
           if (!ref.dataHora) return false;
           const dataApenas = ref.dataHora.split(',')[0].split(' ')[0].trim();
           return dataApenas === hojeStr;
         });
-
-        this.atualizarTotais();
-      } else {
-        this.refeicoesDoDia = [];
       }
+
+      // Mescla refeições da nuvem com itens pendentes na fila offline
+      const pendentesOffline = this.obterRefeicoesOfflineDoDia();
+      this.refeicoesDoDia = [...refeicoesMapeadas, ...pendentesOffline];
+
+      this.atualizarTotais();
     } catch (err) {
       console.error('❌ Erro na chamada à nuvem:', err);
+      this.refeicoesDoDia = this.obterRefeicoesOfflineDoDia();
     } finally {
       this.renderLista();
     }
+  },
+
+  // Extrai refeições que estejam na fila de sincronização offline para o dia de hoje
+  obterRefeicoesOfflineDoDia() {
+    if (typeof StorageService === 'undefined') return [];
+    const fila = StorageService.getOfflineQueue() || [];
+    const hojeStr = new Date().toLocaleDateString('pt-BR');
+
+    return fila
+      .filter(item => item.tipo === 'dieta' && item.dados)
+      .map(item => ({
+        ...item.dados,
+        dataHora: item.dados.dataHora || hojeStr,
+        isOfflinePendente: true
+      }));
   },
 
   bindEvents() {
@@ -174,6 +209,10 @@ const DietaView = {
         const campoTexto = document.getElementById('input-refeicao-ia');
         const texto = campoTexto ? campoTexto.value.trim() : '';
         if (!texto) return alert('Digite o que você comeu.');
+
+        if (typeof StorageService !== 'undefined' && !StorageService.hasGeminiKey()) {
+          return alert('Chave da API Gemini não encontrada. Por favor, configure-a na aba Ajustes.');
+        }
 
         btnIa.disabled = true;
         btnIa.textContent = 'Analisando...';
@@ -206,6 +245,7 @@ const DietaView = {
     if (btnModalSalvar) {
       btnModalSalvar.onclick = async () => {
         const refeicaoFormatada = {
+          dataHora: new Date().toLocaleString('pt-BR'),
           descricao: document.getElementById('editDescricao')?.value.trim() || 'Refeição',
           calorias_kcal: Number(document.getElementById('editKcal')?.value) || 0,
           proteinas_g: Number(document.getElementById('editProteinas')?.value) || 0,
@@ -217,19 +257,7 @@ const DietaView = {
         const campoTexto = document.getElementById('input-refeicao-ia');
         if (campoTexto) campoTexto.value = '';
 
-        this.adicionarRefeicaoNaLista(refeicaoFormatada);
-
-        const fnSalvar = SheetsService.registrarRefeicao || SheetsService.salvarRefeicao;
-        if (typeof fnSalvar === 'function') {
-          try {
-            const resp = await fnSalvar.call(SheetsService, refeicaoFormatada);
-            if (resp && resp.spreadsheetId && typeof StorageService !== 'undefined') {
-              StorageService.setSpreadsheetId(resp.spreadsheetId);
-            }
-          } catch (errSheets) {
-            console.warn('Falha na gravação em nuvem:', errSheets);
-          }
-        }
+        await this.salvarEProcessarRefeicao(refeicaoFormatada);
       };
     }
 
@@ -248,14 +276,13 @@ const DietaView = {
         if (!desc) return alert('Informe a descrição do alimento.');
 
         const dados = {
+          dataHora: new Date().toLocaleString('pt-BR'),
           descricao: desc,
           calorias_kcal: cal,
           proteinas_g: prot,
           carboidratos_g: carb,
           gorduras_g: gord
         };
-
-        this.adicionarRefeicaoNaLista(dados);
 
         document.getElementById('manual-descricao').value = '';
         document.getElementById('manual-calorias').value = '';
@@ -264,11 +291,40 @@ const DietaView = {
         document.getElementById('manual-gorduras').value = '';
         panelManual.style.display = 'none';
 
-        const fnSalvar = SheetsService.registrarRefeicao || SheetsService.salvarRefeicao;
-        if (typeof fnSalvar === 'function') {
-          fnSalvar.call(SheetsService, dados).catch(err => console.warn(err));
-        }
+        await this.salvarEProcessarRefeicao(dados);
       };
+    }
+  },
+
+  async salvarEProcessarRefeicao(refeicao) {
+    this.adicionarRefeicaoNaLista(refeicao);
+
+    const estaOnline = navigator.onLine;
+    const temToken = typeof StorageService !== 'undefined' && StorageService.hasGoogleToken();
+
+    // Se estiver offline ou sem token, salva na fila local para sincronizar depois (T08)
+    if (!estaOnline || !temToken) {
+      if (typeof StorageService !== 'undefined') {
+        StorageService.addToOfflineQueue({ tipo: 'dieta', dados: refeicao });
+        console.log('📌 Refeição adicionada à fila offline para sincronização posterior.');
+      }
+      return;
+    }
+
+    // Se estiver online, tenta enviar imediatamente para a nuvem
+    const fnSalvar = SheetsService.registrarRefeicao || SheetsService.salvarRefeicao;
+    if (typeof fnSalvar === 'function') {
+      try {
+        const resp = await fnSalvar.call(SheetsService, refeicao);
+        if (resp && resp.spreadsheetId && typeof StorageService !== 'undefined') {
+          StorageService.setSpreadsheetId(resp.spreadsheetId);
+        }
+      } catch (errSheets) {
+        console.warn('⚠️ Falha ao salvar na nuvem. Guardando na fila offline:', errSheets.message);
+        if (typeof StorageService !== 'undefined') {
+          StorageService.addToOfflineQueue({ tipo: 'dieta', dados: refeicao });
+        }
+      }
     }
   },
 
@@ -286,7 +342,6 @@ const DietaView = {
     const elGord = document.getElementById('dieta-total-gorduras');
     const elTargetCal = document.getElementById('dieta-target-calorias');
 
-    // Busca a meta atualizada no LocalStorage
     if (typeof StorageService !== 'undefined') {
       const metas = StorageService.getMetas();
       if (metas && metas.metaKcal) {
@@ -311,9 +366,12 @@ const DietaView = {
     }
 
     listContainer.innerHTML = this.refeicoesDoDia.map(ref => `
-      <div class="meal-item" style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+      <div class="meal-item" style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: ${ref.isOfflinePendente ? '3px solid #f39c12' : 'none'};">
         <div class="meal-info">
-          <h4 style="margin: 0 0 4px 0;">${ref.descricao}</h4>
+          <h4 style="margin: 0 0 4px 0;">
+            ${ref.descricao} 
+            ${ref.isOfflinePendente ? '<span style="font-size: 0.7rem; color: #f39c12;">(Pendente Sync)</span>' : ''}
+          </h4>
           <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary, #aaa);">P: ${ref.proteinas_g}g | C: ${ref.carboidratos_g}g | G: ${ref.gorduras_g}g</p>
         </div>
         <div class="meal-calories" style="font-weight: bold; color: #2ecc71;">${ref.calorias_kcal} kcal</div>
