@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e1e" />
+      <stop offset="100%" stop-color="#121212" />
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e676" />
+      <stop offset="100%" stop-color="#00c853" />
+    </linearGradient>
+    <clipPath id="leftHalf">
+      <rect x="0" y="0" width="256" height="512" />
+    </clipPath>
+    <clipPath id="rightHalf">
+      <rect x="256" y="0" width="256" height="512" />
+    </clipPath>
+  </defs>
+
+  <!-- Fundo do Ícone (Rounded Square) -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="#2c2c2c" stroke-width="8" />
+
+  <!-- Círculo Central Neon -->
+  <circle cx="256" cy="256" r="190" fill="none" stroke="url(#greenGrad)" stroke-width="6" opacity="0.8" />
+
+  <!-- Lado Esquerdo: Maçã (Nutrição) -->
+  <g clip-path="url(#leftHalf)">
+    <path d="M 230 180 C 200 150, 140 160, 130 210 C 120 270, 160 340, 210 340 C 230 340, 240 330, 256 330 C 270 330, 280 340, 300 340 C 350 340, 390 270, 380 210 C 370 160, 310 150, 280 180 C 265 195, 245 195, 230 180 Z" fill="url(#greenGrad)" />
+    <!-- Folha da Maçã -->
+    <path d="M 256 160 C 256 120, 290 100, 300 100 C 300 120, 270 150, 256 160 Z" fill="#00e676" />
+  </g>
+
+  <!-- Linha Diagonal Divisora (Estilo Neon) -->
+  <line x1="120" y1="392" x2="392" y2="120" stroke="#00c853" stroke-width="10" stroke-linecap="round" />
+
+  <!-- Lado Direito: Calculadora (Métricas / Treino) -->
+  <g clip-path="url(#rightHalf)">
+    <rect x="280" y="190" width="130" height="170" rx="16" fill="#252525" stroke="#444" stroke-width="4" />
+    <!-- Visor -->
+    <rect x="295" y="205" width="100" height="30" rx="6" fill="#121212" stroke="#00c853" stroke-width="2" />
+    <text x="385" y="226" fill="#00e676" font-family="monospace" font-size="18" text-anchor="end" font-weight="bold">8.8</text>
+    <!-- Teclas -->
+    <circle cx="315" cy="260" r="10" fill="#00c853" />
+    <circle cx="345" cy="260" r="10" fill="#333" />
+    <circle cx="375" cy="260" r="10" fill="#333" />
+    <circle cx="315" cy="290" r="10" fill="#333" />
+    <circle cx="345" cy="290" r="10" fill="#00c853" />
+    <circle cx="375" cy="290" r="10" fill="#333" />
+    <circle cx="315" cy="320" r="10" fill="#333" />
+    <circle cx="345" cy="320" r="10" fill="#333" />
+    <circle cx="375" cy="320" r="10" fill="#00c853" />
+  </g>
+</svg>

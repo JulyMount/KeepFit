@@ -1,15 +1,23 @@
 {
-  "name": "Fitness Management App",
-  "short_name": "FitApp",
-  "start_url": "/",
+  "name": "Keep In Fit",
+  "short_name": "KeepInFit",
+  "description": "Aplicativo Offline-First para controle nutricional, dieta e treino.",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#121212",
-  "theme_color": "#121212",
+  "theme_color": "#00c853",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
