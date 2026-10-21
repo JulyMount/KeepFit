@@ -27,3 +27,5 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`[Servidor Rodando] Acesse http://localhost:${PORT}`);
 });
+
+module.exports = app;
