@@ -48,6 +48,10 @@ const DietaView = {
             <span class="macro-value" id="dieta-total-gorduras">0g</span>
           </div>
         </div>
+        <!-- Mensagem explicativa abaixo dos macros -->
+        <p style="text-align: center; font-size: 0.75rem; color: #888; margin-top: 10px; margin-bottom: 0;">
+          💡 Altere sua meta diária na aba <strong style="color: #007bff; cursor: pointer;" onclick="document.querySelector('[data-target=\'view-config\']')?.click()">⚙️ Ajustes</strong>
+        </p>
       </div>
 
       <!-- Formulário de Registro com IA -->
