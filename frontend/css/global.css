@@ -131,3 +131,411 @@ body {
 .nav-btn.active {
   color: var(--primary-color);
 }
+
+/* ==========================================================================
+   ESTILOS DOS MODAIS E BOTTOM SHEETS (UX REAUTENTICAÇÃO & WIZARD)
+   ========================================================================== */
+
+.bottom-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+  backdrop-filter: blur(4px);
+}
+
+.bottom-sheet-overlay.hidden {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bottom-sheet-card {
+  background: var(--surface-color);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease-out;
+  position: relative;
+  border-top: 1px solid var(--border-color);
+}
+
+.bottom-sheet-card.large {
+  max-height: 90vh;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 5px;
+  background: #444;
+  border-radius: 3px;
+  margin: 0 auto 16px auto;
+}
+
+.sheet-icon {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.bottom-sheet-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.bottom-sheet-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.sheet-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.sheet-sub {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+.btn-close-icon {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.6rem;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* Wizard Passo a Passo */
+.wizard-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.wizard-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.step-num {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--primary-color);
+  font-weight: bold;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-content {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.step-content p {
+  margin-bottom: 6px;
+  color: var(--text-color);
+}
+
+.btn-link-action {
+  display: inline-block;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  color: var(--primary-color);
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+  transition: background 0.2s;
+}
+
+.btn-link-action:hover {
+  background: #333;
+}
+
+/* ==========================================================================
+   MOCKUPS CSS DAS TELAS REAIS DO GOOGLE AI STUDIO (0 KB DE IMAGENS)
+   ========================================================================== */
+
+.mockup-container {
+  background: #181818;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.mockup-header {
+  background: #252525;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #333;
+}
+
+.mockup-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mockup-dot.red { background: #ff5f56; }
+.mockup-dot.yellow { background: #ffbd2e; }
+.mockup-dot.green { background: #27c93f; }
+
+.mockup-title {
+  margin-left: 8px;
+  color: #888;
+  font-size: 0.7rem;
+  font-family: monospace;
+}
+
+.mockup-body {
+  display: flex;
+  height: 55px;
+  background: #121212;
+  padding: 10px;
+  align-items: center;
+}
+
+.mockup-body.align-right {
+  justify-content: flex-end;
+}
+
+/* Botão do AI Studio */
+.mockup-btn-dark {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  position: relative;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Caixas de Diálogo/Modais do AI Studio */
+.mockup-dialog {
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 8px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.mockup-dialog-title {
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: #eee;
+  margin-bottom: 8px;
+}
+
+.mockup-dialog-field {
+  background: #121212;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-bottom: 10px;
+}
+
+.mockup-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.mockup-text-btn {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.mockup-btn-pill {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #555;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  position: relative;
+}
+
+.mockup-btn-pill.accent {
+  background: #333;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.mockup-key-box {
+  background: #121212;
+  border: 1px solid #333;
+  padding: 8px 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.mockup-icon-copy {
+  font-size: 0.9rem;
+  color: var(--primary-color);
+}
+
+/* Cursor Animado */
+.mockup-cursor {
+  position: absolute;
+  right: -8px;
+  bottom: -10px;
+  font-size: 1.1rem;
+  animation: pointClick 1.5s infinite ease-in-out;
+  z-index: 10;
+}
+
+@keyframes pointClick {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-4px, -4px) scale(1.15); }
+}
+
+/* Campo de Entrada e Validação da Chave */
+.input-validation-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.input-validation-wrapper input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #2b2b2b;
+  border: 1px solid var(--border-color);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-validation-wrapper input.valid {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.3);
+}
+
+.validation-badge {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  background: rgba(0, 230, 118, 0.2);
+  color: var(--primary-color);
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.validation-badge.hidden {
+  display: none;
+}
+
+.input-status-text {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  min-height: 16px;
+}
+
+/* Ações e Botões do Sheet */
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-primary-action {
+  width: 100%;
+  padding: 12px;
+  background: var(--primary-color);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-secondary-action {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Animação de Scroll Guiado / Pulse Glow na Tela de Ajustes */
+.pulse-glow-highlight {
+  animation: pulseGlow 1.2s ease-in-out infinite alternate !important;
+  border: 2px solid var(--primary-color) !important;
+  border-radius: 12px;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 4px rgba(0, 230, 118, 0.3);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 18px rgba(0, 230, 118, 0.8);
+    transform: scale(1.02);
+  }
+}

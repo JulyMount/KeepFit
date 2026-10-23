@@ -102,7 +102,7 @@
     </button>
   </nav>
 
-  <!-- Modal de Confirmação -->
+  <!-- Modal de Confirmação de Refeição -->
   <div id="modalConfirmacao" class="modal-overlay hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000;">
     <div style="background: #1e1e1e; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; color: white;">
       <h3 style="margin-top:0;">Confirmar Refeição</h3>
@@ -122,6 +122,131 @@
       <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
         <button id="btnCancelarModal" style="padding: 8px 16px; background: #555; border: none; color: white; border-radius: 6px; cursor: pointer;">Cancelar</button>
         <button id="btnSalvarModal" style="padding: 8px 16px; background: #00c853; border: none; color: white; border-radius: 6px; cursor: pointer;">Confirmar e Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet / Modal: Reautenticação Google em Contexto -->
+  <div id="modalReauthGoogle" class="bottom-sheet-overlay hidden">
+    <div class="bottom-sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-icon">🔑</div>
+      <h3>Sessão do Google Expirada</h3>
+      <p>A sua ligação com a nuvem expirou. Reconecte a sua conta para manter a sincronização com o Google Sheets ativa.</p>
+      
+      <div class="sheet-actions">
+        <button id="btnReconectarGoogleModal" class="btn-primary-action">
+          <span>Reconectar Conta Google</span>
+        </button>
+        <button id="btnFecharReauthModal" class="btn-secondary-action">Continuar Offline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet / Modal: Wizard e Mockup CSS da Chave Gemini (4 Passos Reais) -->
+  <div id="modalGeminiWizard" class="bottom-sheet-overlay hidden">
+    <div class="bottom-sheet-card large">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header-row">
+        <h3>✨ Ativar Inteligência Artificial</h3>
+        <button id="btnFecharGeminiModal" class="btn-close-icon">&times;</button>
+      </div>
+      
+      <p class="sheet-sub">Siga estes 4 passos simples no Google AI Studio (100% gratuito):</p>
+
+      <!-- Wizard Passo a Passo com Mockups CSS Fidedignos -->
+      <div class="wizard-steps">
+        
+        <!-- Passo 1 -->
+        <div class="wizard-step">
+          <span class="step-num">1</span>
+          <div class="step-content">
+            <p><strong>Aceda ao Google AI Studio:</strong></p>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+              🔗 Abrir Google AI Studio (Gratuito)
+            </a>
+          </div>
+        </div>
+
+        <!-- Passo 2: Mockup CSS do Botão Principal -->
+        <div class="wizard-step">
+          <span class="step-num">2</span>
+          <div class="step-content">
+            <p><strong>Clique no botão no topo da página:</strong></p>
+            <div class="mockup-container">
+              <div class="mockup-header">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+                <span class="mockup-title">aistudio.google.com/app/apikey</span>
+              </div>
+              <div class="mockup-body align-right">
+                <div class="mockup-btn-dark">
+                  <span>🔑 Criar chave de API</span>
+                  <div class="mockup-cursor">👆</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passo 3: Mockup CSS da Janela de Confirmação -->
+        <div class="wizard-step">
+          <span class="step-num">3</span>
+          <div class="step-content">
+            <p><strong>Na janela que se abre, clique em "Criar chave":</strong></p>
+            <div class="mockup-dialog">
+              <div class="mockup-dialog-title">Criar uma nova chave</div>
+              <div class="mockup-dialog-field">Gemini API Key</div>
+              <div class="mockup-dialog-actions">
+                <span class="mockup-text-btn">Cancelar</span>
+                <div class="mockup-btn-pill">
+                  Criar chave
+                  <div class="mockup-cursor">👆</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passo 4: Mockup CSS da Cópia da Chave -->
+        <div class="wizard-step">
+          <span class="step-num">4</span>
+          <div class="step-content">
+            <p><strong>Copie a chave gerada:</strong></p>
+            <div class="mockup-dialog">
+              <div class="mockup-dialog-title">Detalhes da chave de API</div>
+              <div class="mockup-key-box">
+                <code>AQ.Ab8RN6K...</code>
+                <span class="mockup-icon-copy">📋</span>
+              </div>
+              <div class="mockup-dialog-actions">
+                <div class="mockup-btn-pill accent">
+                  Copiar chave
+                  <div class="mockup-cursor">👆</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passo 5: Campo de Cola e Validação -->
+        <div class="wizard-step">
+          <span class="step-num">5</span>
+          <div class="step-content">
+            <p><strong>Cole a sua chave abaixo:</strong></p>
+            <div class="input-validation-wrapper">
+              <input type="password" id="geminiKeyInputModal" placeholder="Cole aqui (ex: AIzaSy...)" autocomplete="off">
+              <span id="geminiKeyValidationBadge" class="validation-badge hidden">✓ Válida</span>
+            </div>
+            <span id="geminiKeyStatusModal" class="input-status-text"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sheet-actions">
+        <button id="btnSalvarGeminiKeyModal" class="btn-primary-action" disabled>Guardar e Ativar IA</button>
       </div>
     </div>
   </div>

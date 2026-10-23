@@ -10,6 +10,7 @@ const ConfigView = {
 
     this.render(container);
     this.bindEvents();
+    this.bindModalsEvents();
   },
 
   render(container) {
@@ -27,7 +28,7 @@ const ConfigView = {
       <div class="input-card">
         <h3>Metas Nutricionais Diárias</h3>
         <p style="font-size: 0.8rem; color: var(--text-secondary, #aaa); margin: 8px 0;">
-          Ajuste seus alvos diários de calorias e distribuição de macronutrientes.
+          Ajuste os seus alvos diários de calorias e distribuição de macronutrientes.
         </p>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
           <div>
@@ -48,29 +49,32 @@ const ConfigView = {
           </div>
         </div>
         <button id="btn-salvar-metas" class="btn btn-primary" style="width: 100%;">
-          Salvar Metas Nutricionais
+          Guardar Metas Nutricionais
         </button>
       </div>
 
       <!-- Card Chave Gemini -->
-      <div class="input-card" style="margin-top: 15px;">
+      <div id="card-gemini-key" class="input-card" style="margin-top: 15px;">
         <h3>Chave da API Gemini (BYOK)</h3>
         <p style="font-size: 0.8rem; color: var(--text-secondary, #aaa); margin: 8px 0;">
-          Obtenha sua chave gratuita no Google AI Studio e cole abaixo.
+          Obtenha a sua chave gratuita no Google AI Studio e cole abaixo.
         </p>
-        <div class="input-group">
-          <input type="text" id="config-gemini-key" placeholder="AIzaSy..." value="${keySalva}">
-          <button id="btn-salvar-gemini-key" class="btn btn-primary">Salvar Chave API</button>
+        <div class="input-group" style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <input type="text" id="config-gemini-key" placeholder="AIzaSy..." value="${keySalva}" style="flex: 1; padding: 10px; background: #2b2b2b; border: 1px solid #333; color: white; border-radius: 8px;">
+          <button id="btn-salvar-gemini-key" class="btn btn-primary" style="padding: 10px 14px; background: #00e676; border: none; color: black; font-weight: bold; border-radius: 8px; cursor: pointer;">Guardar</button>
         </div>
+        <button id="btn-abrir-wizard-gemini" style="width: 100%; padding: 8px; background: transparent; border: 1px dashed #00e676; color: #00e676; font-size: 0.82rem; font-weight: 600; border-radius: 8px; cursor: pointer;">
+          ✨ Não sabe como pegar a chave? Clique aqui (30s)
+        </button>
       </div>
 
       <!-- Card Autenticação Google -->
-      <div class="input-card" style="margin-top: 15px;">
+      <div id="card-google-auth" class="input-card" style="margin-top: 15px;">
         <h3>Autenticação Google Drive</h3>
         <p style="font-size: 0.8rem; color: var(--text-secondary, #aaa); margin: 8px 0;">
-          Sua conta é usada para ler e gravar suas planilhas de forma isolada.
+          A sua conta é usada para ler e gravar as suas folhas de cálculo de forma isolada.
         </p>
-        <button id="btn-login-google" class="btn ${tokenSalvo ? 'btn-primary' : 'btn-secondary'}" style="width: 100%;">
+        <button id="btn-login-google" class="btn ${tokenSalvo ? 'btn-primary' : 'btn-secondary'}" style="width: 100%; padding: 12px; background: ${tokenSalvo ? '#00e676' : '#333'}; color: ${tokenSalvo ? '#000' : '#fff'}; border: none; font-weight: bold; border-radius: 8px; cursor: pointer;">
           ${tokenSalvo ? 'Conta Conectada ✓' : 'Conectar Conta Google'}
         </button>
       </div>
@@ -79,19 +83,19 @@ const ConfigView = {
       <div class="input-card" style="margin-top: 15px;">
         <h3>Sincronização de Dados</h3>
         <p style="font-size: 0.8rem; color: var(--text-secondary, #aaa); margin: 8px 0;">
-          Compara os dados locais com a planilha no Google Sheets e permite escolher qual versão manter.
+          Compara os dados locais com a folha de cálculo no Google Sheets e permite escolher qual versão manter.
         </p>
-        <button id="btn-sync-cloud" class="btn btn-secondary" style="width: 100%;">
-          🔄 Sincronizar Dados da Planilha
+        <button id="btn-sync-cloud" class="btn btn-secondary" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; cursor: pointer;">
+          🔄 Sincronizar Dados da Folha de Cálculo
         </button>
       </div>
 
       <!-- Container do Modal de Sincronização Inteligente -->
       <div id="modalSyncInteligente" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px;">
         <div style="background: #1e1e1e; padding: 20px; border-radius: 12px; width: 100%; max-width: 440px; color: white; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-          <h3 style="margin-top:0; font-size: 1.1rem; color: #fff;">Divergência de Dados Detectada ⚖️</h3>
+          <h3 style="margin-top:0; font-size: 1.1rem; color: #fff;">Divergência de Dados Detetada ⚖️</h3>
           <p style="font-size: 0.82rem; color: #ccc; margin: 8px 0 16px 0;">
-            Os dados locais do aplicativo são diferentes das informações guardadas na planilha:
+            Os dados locais da aplicação são diferentes das informações guardadas na folha de cálculo:
           </p>
           
           <div id="sync-comparativo-body" style="background: #2b2b2b; padding: 12px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 20px;">
@@ -119,6 +123,7 @@ const ConfigView = {
     const btnSalvarKey = document.getElementById('btn-salvar-gemini-key');
     const btnLoginGoogle = document.getElementById('btn-login-google');
     const btnSyncCloud = document.getElementById('btn-sync-cloud');
+    const btnAbrirWizard = document.getElementById('btn-abrir-wizard-gemini');
 
     // 1. Salvar Metas Nutricionais na Aplicação
     if (btnSalvarMetas) {
@@ -145,20 +150,20 @@ const ConfigView = {
         if (estaOnline && temToken) {
           try {
             btnSalvarMetas.disabled = true;
-            btnSalvarMetas.textContent = 'Salvando na Nuvem...';
+            btnSalvarMetas.textContent = 'Guardando na Nuvem...';
 
             const perfilCompleto = StorageService.getPerfil() || {};
             const fnSalvarPerfil = SheetsService.registrarPerfil || SheetsService.salvarPerfil;
             if (typeof fnSalvarPerfil === 'function') {
               await fnSalvarPerfil.call(SheetsService, perfilCompleto);
             }
-            alert('Metas salvas e sincronizadas na planilha!');
+            alert('Metas salvas e sincronizadas na folha de cálculo!');
           } catch (err) {
             console.warn('⚠️ Falha ao salvar perfil na nuvem, mantido localmente:', err);
             alert('Metas salvas localmente!');
           } finally {
             btnSalvarMetas.disabled = false;
-            btnSalvarMetas.textContent = 'Salvar Metas Nutricionais';
+            btnSalvarMetas.textContent = 'Guardar Metas Nutricionais';
           }
         } else {
           alert('Metas salvas localmente!');
@@ -174,17 +179,28 @@ const ConfigView = {
 
         StorageService.setGeminiKey(key);
         alert('Chave da API salva com sucesso!');
+        if (typeof Navigation !== 'undefined' && Navigation.verificarEInicializar) {
+          Navigation.verificarEInicializar();
+        }
       });
     }
 
-    // 3. Login Google
+    // 3. Abrir Wizard do Gemini
+    if (btnAbrirWizard) {
+      btnAbrirWizard.addEventListener('click', () => {
+        const modalGemini = document.getElementById('modalGeminiWizard');
+        if (modalGemini) modalGemini.classList.remove('hidden');
+      });
+    }
+
+    // 4. Login Google
     if (btnLoginGoogle) {
       btnLoginGoogle.addEventListener('click', () => {
         AuthService.fazerLoginGoogle();
       });
     }
 
-    // 4. Sincronização Inteligente (Push vs Pull)
+    // 5. Sincronização Inteligente (Push vs Pull)
     if (btnSyncCloud) {
       btnSyncCloud.addEventListener('click', async () => {
         try {
@@ -214,7 +230,7 @@ const ConfigView = {
             localGord !== nuvemGord;
 
           if (!temDiferenca && perfilNuvem) {
-            alert('Tudo atualizado! Seus dados locais já estão idênticos aos da planilha. 👍');
+            alert('Tudo atualizado! Os seus dados locais já estão idênticos aos da folha de cálculo. 👍');
             return;
           }
 
@@ -225,9 +241,90 @@ const ConfigView = {
           alert(`Erro ao verificar sincronização: ${err.message}`);
         } finally {
           btnSyncCloud.disabled = false;
-          btnSyncCloud.textContent = '🔄 Sincronizar Dados da Planilha';
+          btnSyncCloud.textContent = '🔄 Sincronizar Dados da Folha de Cálculo';
         }
       });
+    }
+  },
+
+  bindModalsEvents() {
+    // --- Modal Reautenticação Google ---
+    const modalReauth = document.getElementById('modalReauthGoogle');
+    const btnReconectarModal = document.getElementById('btnReconectarGoogleModal');
+    const btnFecharReauthModal = document.getElementById('btnFecharReauthModal');
+
+    if (btnReconectarModal) {
+      btnReconectarModal.onclick = () => {
+        if (modalReauth) modalReauth.classList.add('hidden');
+        AuthService.fazerLoginGoogle();
+      };
+    }
+
+    if (btnFecharReauthModal) {
+      btnFecharReauthModal.onclick = () => {
+        if (modalReauth) modalReauth.classList.add('hidden');
+      };
+    }
+
+    // --- Modal Wizard do Gemini & Validação Instantânea ---
+    const modalGemini = document.getElementById('modalGeminiWizard');
+    const btnFecharGemini = document.getElementById('btnFecharGeminiModal');
+    const inputGeminiModal = document.getElementById('geminiKeyInputModal');
+    const validationBadge = document.getElementById('geminiKeyValidationBadge');
+    const btnSalvarGeminiModal = document.getElementById('btnSalvarGeminiKeyModal');
+    const statusTextModal = document.getElementById('geminiKeyStatusModal');
+
+    if (btnFecharGemini) {
+      btnFecharGemini.onclick = () => {
+        if (modalGemini) modalGemini.classList.add('hidden');
+      };
+    }
+
+    if (inputGeminiModal) {
+      const validarChaveInput = () => {
+        const val = inputGeminiModal.value.trim();
+        const eValida = val.startsWith('AIzaSy') && val.length >= 35;
+
+        if (eValida) {
+          inputGeminiModal.classList.add('valid');
+          if (validationBadge) validationBadge.classList.remove('hidden');
+          if (btnSalvarGeminiModal) btnSalvarGeminiModal.disabled = false;
+          if (statusTextModal) {
+            statusTextModal.textContent = 'Formato de chave válido!';
+            statusTextModal.style.color = '#00e676';
+          }
+        } else {
+          inputGeminiModal.classList.remove('valid');
+          if (validationBadge) validationBadge.classList.add('hidden');
+          if (btnSalvarGeminiModal) btnSalvarGeminiModal.disabled = true;
+          if (statusTextModal) {
+            statusTextModal.textContent = val.length > 0 ? 'A chave deve começar com "AIzaSy..."' : '';
+            statusTextModal.style.color = '#a0a0a0';
+          }
+        }
+      };
+
+      inputGeminiModal.addEventListener('input', validarChaveInput);
+      inputGeminiModal.addEventListener('paste', () => setTimeout(validarChaveInput, 100));
+    }
+
+    if (btnSalvarGeminiModal) {
+      btnSalvarGeminiModal.onclick = () => {
+        const key = inputGeminiModal.value.trim();
+        if (!key) return;
+
+        StorageService.setGeminiKey(key);
+
+        const inputConfig = document.getElementById('config-gemini-key');
+        if (inputConfig) inputConfig.value = key;
+
+        if (modalGemini) modalGemini.classList.add('hidden');
+        alert('Chave da API Gemini ativada com sucesso!');
+
+        if (typeof Navigation !== 'undefined' && Navigation.verificarEInicializar) {
+          Navigation.verificarEInicializar();
+        }
+      };
     }
   },
 
@@ -283,7 +380,7 @@ const ConfigView = {
         btnPush.textContent = 'Enviando...';
         const perfilAEnviar = StorageService.getPerfil() || {};
         await SheetsService.registrarPerfil(perfilAEnviar);
-        alert('Sucesso! Dados locais salvos na planilha no Google Sheets.');
+        alert('Sucesso! Dados locais salvos na folha de cálculo no Google Sheets.');
         modal.style.display = 'none';
       } catch (e) {
         alert(`Erro ao enviar para a nuvem: ${e.message}`);
@@ -306,7 +403,7 @@ const ConfigView = {
           });
         }
         StorageService.setPerfil(nuvem);
-        alert('Sucesso! Aplicativo atualizado com os dados da planilha.');
+        alert('Sucesso! Aplicativo atualizado com os dados da folha de cálculo.');
         modal.style.display = 'none';
         this.init();
       }

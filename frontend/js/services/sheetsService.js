@@ -25,7 +25,7 @@ const SheetsService = {
         const err = await response.json().catch(() => ({}));
         const mensagemErro = err.message || err.error || `Erro HTTP ${response.status}`;
 
-        // Trata tokens expirados, revogados ou credenciais inválidas do Google (T01/T02)
+        // Trata tokens expirados, revogados ou credenciais inválidas do Google
         if (
           response.status === 401 || 
           mensagemErro.includes('Invalid Credentials') || 
@@ -45,8 +45,11 @@ const SheetsService = {
             SyncOfflineService.handleStatusChange();
           }
 
-          // Redireciona para a ecrã de ligação do Google se a navegação estiver ativa
-          if (typeof Navigation !== 'undefined' && typeof Navigation.verificarEInicializar === 'function') {
+          // Abre o Modal de Reautenticação em contexto sem retirar o utilizador do ecrã onde se encontra
+          const modalReauth = document.getElementById('modalReauthGoogle');
+          if (modalReauth) {
+            modalReauth.classList.remove('hidden');
+          } else if (typeof Navigation !== 'undefined' && typeof Navigation.verificarEInicializar === 'function') {
             Navigation.verificarEInicializar();
           }
         }
